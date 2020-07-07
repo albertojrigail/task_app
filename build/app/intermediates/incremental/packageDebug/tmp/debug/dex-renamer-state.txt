@@ -1,0 +1,4 @@
+#Mon Jul 06 13:26:19 ECT 2020
+base.0=/Users/albertojrigail/Desktop/Internship Summer 2020/Independent Projects/to_do_app/build/app/intermediates/dex/debug/mergeDexDebug/out/classes.dex
+path.0=classes.dex
+renamed.0=classes.dex
