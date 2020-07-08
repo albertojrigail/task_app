@@ -4,10 +4,10 @@ Application where users can write down their most relevant tasks. They may also 
 
 ## Implementation Details:
 This project has been developed using the Flutter Framework and the Dart programming language. It has been tested in and supports both iOS and Android.
-User information is stored in Google Firebase securely.
+User information is stored in Cloud Firebase securely.
 
 ## Learning Outcomes:
 - Building stateful and stateless widgets
 - Using the setState function to address reactive features
 - Creating classes to encapsulate information into objects
-- Using the functionalities of REST APIs for storing notes in Google Firebase.
+- Using the functionalities of REST APIs for storing notes in Cloud Firebase.
