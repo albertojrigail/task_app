@@ -5,42 +5,35 @@ import 'package:to_do_app/models/task.dart';
 final String emptyTaskMessage = 'Emtpy Task!';
 
 class CreateTaskPage extends StatefulWidget {
-  // Task object to be created or modified
-  final Task task;
+  final Task task; // task to be created or modified
+  final taskMode mode; // edit vs create mode
 
-  // Create vs. Edit page
-  final bool isEditMode;
-
-  CreateTaskPage({Key key, this.isEditMode, this.task}) : super(key: key);
+  CreateTaskPage({Key key, this.mode, this.task}) : super(key: key);
 
   @override
-  _CreateTaskPageState createState() => _CreateTaskPageState(isEditMode: this.isEditMode, task: this.task);
+  _CreateTaskPageState createState() => _CreateTaskPageState(mode: this.mode, task: this.task);
 }
 
 class _CreateTaskPageState extends State<CreateTaskPage> {
-  // Text Editing Controllers
+  // text editing controllers
   TextEditingController _taskDescriptionController = TextEditingController();
   TextEditingController _taskCategoryController = TextEditingController();
 
-  // Error Message Handling
-  bool isError;
-  String errorMessage;
+  Task task; // task to be created or modified
+  TaskBloc taskBloc = TaskBloc(); // singleton TaskBloc
+  taskMode mode; /// edit vs create mode
 
-  // Instance variables
-  bool isEditMode;
-  Task task;
-  _CreateTaskPageState({this.isEditMode, this.task});
+  bool isError; // handles error messages
+  String errorMessage; // displayed on error
+
+  _CreateTaskPageState({this.mode, this.task});
 
   initState() {
     super.initState();
-    if(isEditMode == true && task != null) {
-      _taskDescriptionController.text = task.text;
-      _taskCategoryController.text = task.category;
-    }
+    if (task == null) task = new Task(text:'', category: '', state: taskState.stateProgress);
+    _taskDescriptionController.text = task.text;
+    _taskCategoryController.text = task.category;
   } 
-
-  // Task Bloc
-  TaskBloc taskBloc = TaskBloc();
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +42,8 @@ class _CreateTaskPageState extends State<CreateTaskPage> {
         children: <Widget>[
           Scaffold(
             appBar: AppBar(
-              title: isEditMode == true ? Text('Edit Task') : Text('Create Task'),
+              title: mode == taskMode.modeCreate ?
+              Text('Create Task') : Text('Edit Task'),
             ),
             body: Padding(
               padding: const EdgeInsets.all(50.0),
@@ -67,30 +61,26 @@ class _CreateTaskPageState extends State<CreateTaskPage> {
                         FlatButton(
                           child: Text('Accept', style: TextStyle(color: Colors.blue)),
                           onPressed: () {
-                            final description = _taskDescriptionController.text;
+                            final text = _taskDescriptionController.text;
                             final category = _taskCategoryController.text;
 
-                            // valid description name
-                            if(description.isNotEmpty) {
+                            // non-empty description
+                            if(text.isNotEmpty) {
+                              task.text = text;
+                              task.category = category;
+
+                              // create new task
+                              if(mode == taskMode.modeCreate) taskBloc.addTask(task);
                               
-                              // modify existing task 
-                              if(isEditMode == true) {
-                                taskBloc.updateTask(task, description, category);
-                              }
-                              // add new task to list
-                              else {
-                                Task task = new Task();
-                                task.text = _taskDescriptionController.text;
-                                task.category = _taskCategoryController.text;
-                                taskBloc.addTask(task);
-                              }
+                              // update task
+                              else taskBloc.updateTask(task);
+
+                              // pop and clean
                               Navigator.of(context).pop();
                               _taskDescriptionController.text = '';
                               _taskCategoryController.text = '';
-                            }
-                            
-                            // display error message
-                            else {
+                            } else {
+                              // display error message
                               setState(() {
                                 isError = true;
                                 errorMessage = emptyTaskMessage;
@@ -108,7 +98,7 @@ class _CreateTaskPageState extends State<CreateTaskPage> {
                           },
                         ),
                         // remove button
-                        isEditMode == true ? FlatButton(
+                        mode == taskMode.modeEdit ? FlatButton(
                           child: Text('Remove', style: TextStyle(color: Colors.orange)),
                           onPressed: () {
                             Navigator.of(context).pop();

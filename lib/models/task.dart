@@ -1,10 +1,12 @@
+enum taskState {stateProgress, stateDone}
+enum taskMode {modeCreate, modeEdit}
+
 class Task {
   String text;
   String category;
-  String iconUrl;
   DateTime dateCreated = DateTime.now();
-  bool isDone = false;
+  taskState state = taskState.stateProgress;
 
   // constructor
-  Task({this.text, this.category});
+  Task({this.text, this.category, this.state});
 }

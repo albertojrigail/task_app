@@ -1,32 +1,73 @@
-import 'dart:async';
 import 'package:to_do_app/models/task.dart';
+import 'package:rxdart/rxdart.dart';
 
 class TaskBloc {
-  List<Task> tasks = [];
   
-  // creates a Singleton
+  List<Task> tasksProgress = [];
+  List<Task> tasksDone = [];
+
+  // controller
+  BehaviorSubject<List<Task>> _subjectProgressTaskList = new BehaviorSubject<List<Task>>.seeded([]);
+  BehaviorSubject<List<Task>> _subjectDoneTaskList = new BehaviorSubject<List<Task>>.seeded([]);
+
+ // get methods
+  BehaviorSubject<List<Task>> get subjectProgress => _subjectProgressTaskList.stream;
+  BehaviorSubject<List<Task>> get subjectDone => _subjectDoneTaskList.stream;
+
+  // singleton for class TaskBloc
   factory TaskBloc() => _taskBloc;
   static final TaskBloc _taskBloc = TaskBloc._internal();
   TaskBloc._internal();
-  
-  // Stream Controller objects
-  final _controllerTaskList = StreamController<List<Task>>();
 
-  // get functions
-  Stream<List<Task>> get stream => _controllerTaskList.stream;
   
-  // functions to manipulate the list tasks
+  // adds task to the in progress task list
+  // adds the updated list to the _subjectProgressTaskList
   addTask(Task task) {
-    tasks.add(task);
-    _controllerTaskList.sink.add(this.tasks);
+    tasksProgress.add(task);
+    _subjectProgressTaskList.add(this.tasksProgress);
   }
+
+  // removes task from the corresponding list, depending on its state
+  // adds the updated list to the corresponding subject
   removeTask(Task task) {
-    tasks.remove(task);
-    _controllerTaskList.sink.add(this.tasks);
+    if(task.state == taskState.stateDone) {
+      tasksDone.remove(task);
+      _subjectDoneTaskList.add(this.tasksDone);
+    } else {
+      tasksProgress.remove(task);
+      _subjectProgressTaskList.add(this.tasksProgress);
+    }
   }
-  updateTask(Task task, String text, String category) {
-    task.text = text;
-    task.category = category;
-    _controllerTaskList.sink.add(this.tasks);
+
+  // updates task on the corresponding list, depending on its state
+  // adds the updated list to the corresponding subject
+  updateTask(Task task) {
+    if(task.state == taskState.stateDone) {
+      _subjectProgressTaskList.add(this.tasksDone);
+    } else {
+      _subjectDoneTaskList.add(this.tasksProgress);
+    }
+  }
+
+  // moves a task from one list to another list, depending on newState
+  // adds both updated lists to their corresponding subjects
+  changeTaskState(Task task, taskState newState) {
+    if(newState == taskState.stateDone) {
+      tasksProgress.remove(task);
+      task.state = taskState.stateDone;
+      tasksDone.add(task);
+    } else {
+      tasksDone.remove(task);
+      task.state = taskState.stateProgress;
+      tasksProgress.add(task);
+    }
+    _subjectDoneTaskList.add(this.tasksDone);
+    _subjectProgressTaskList.add(this.tasksProgress);
+  }
+
+  // closes the BehaviorSubject objects
+  void dispose() {
+    _subjectProgressTaskList.close();
+    _subjectDoneTaskList.close();
   }
 }
