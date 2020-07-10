@@ -13,4 +13,4 @@ This project has been developed using the Flutter Framework and the Dart program
 
 ## Screenshots:
 ![create_page.png]
-(https://github.com/albertojrigail/task_app/tree/master/screenshots/create_page.png)
+(https://github.com/albertojrigail/task_app/blob/master/screenshots/create_page.png?raw=true)
