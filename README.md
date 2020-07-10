@@ -12,4 +12,5 @@ This project has been developed using the Flutter Framework and the Dart program
 - Using streams and the StreamBuilder Widget to send and receive asynchronous events
 
 ## Screenshots:
-![alt text] (https://github.com/albertojrigail/task_app/blob/master/screenshots/create_page.png?raw=true)
+![alt text]
+(https://github.com/albertojrigail/task_app/blob/master/screenshots/create_page.png?raw=true)
